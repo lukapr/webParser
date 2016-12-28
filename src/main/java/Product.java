@@ -5,10 +5,19 @@ import lombok.ToString;
  * Created by pryaly on 12/28/2016.
  */
 @Data
-@ToString
 public class Product {
 
-    String href;
-    String name;
-    String count;
+    private String href;
+    private String name;
+    private String count;
+    private String article;
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "name='" + name + '\'' +
+                ", count='" + count + '\'' +
+                ", article='" + article + '\'' +
+                '}';
+    }
 }

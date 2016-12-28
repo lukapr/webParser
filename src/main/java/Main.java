@@ -1,14 +1,11 @@
-import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +16,14 @@ public class Main {
     private static final String BASE_URL = "https://www.wildberries.ru";
 
     public static void main(String[] args) {
+        if (args == null || args.length != 2) {
+            System.out.println("USE webparser.java [path to file with result] [number of products (<= 40)]");
+            System.exit(0);
+        }
+        if (Integer.parseInt(args[1]) > 40) {
+            System.out.println("Number of products should be <= 40");
+            System.exit(0);
+        }
         Document doc = null;
         try {
             doc = Jsoup
@@ -30,6 +35,18 @@ public class Main {
 
         List<Element> brandNames = doc.getElementsByAttributeValue("class", "cg_list_item");
         List<Product> products = brandNames.stream().map(Main::createProduct).collect(Collectors.toList());
+        products = products.subList(0, Math.min(products.size(), Integer.parseInt(args[1])));
+        PrintWriter pw = null;
+        try {
+            pw = new PrintWriter(new FileOutputStream(args[0]));
+        } catch (FileNotFoundException e) {
+            System.out.println("File doesn't exist");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        for (Product product : products)
+            pw.println(product.toString());
+        pw.close();
 
     }
 
@@ -37,35 +54,21 @@ public class Main {
         Product product = new Product();
         product.setHref(e.getElementsByAttribute("href").attr("href"));
         product.setName(e.getElementsByAttributeValue("class", "cg_c cg_brand").text());
-        try {
-            getCount(product.getHref());
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
-        System.out.println(product);
+
+        getCount(product.getHref(), product);
+
         return product;
     }
 
-    private static int getCount(String url) throws IOException {
+    private static void getCount(String url, Product p) {
         Document doc = null;
         try {
-            doc = Jsoup
-                    .connect(BASE_URL + url).get();
+            doc = Jsoup.connect(BASE_URL + url).userAgent("Mozilla/5.0").get();
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(-1);
         }
-        doc.getElementById("product_articul").text();
-        System.out.println(doc.toString());
-
-        HttpGet req = new HttpGet(BASE_URL + url);
-//        req.setHeader("User-Agent", DEFAULT_USER_AGENT);
-        CloseableHttpClient client = HttpClients.createDefault();
-             CloseableHttpResponse response = client.execute(req);
-            InputStream inputStream = response.getEntity().getContent();
-            IOUtils.toString(inputStream);
-
-
-        return 0;
+        p.setCount(doc.getElementsByAttributeValue("class", "j-orders-count").text());
+        p.setArticle(doc.getElementsByAttributeValue("class", "article j-article").text());
     }
 }
