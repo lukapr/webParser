@@ -4,10 +4,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +19,10 @@ import java.util.Map;
 public class Main {
     private static final String BASE_URL = "https://www.wildberries.ru";
     private static final String NO_PRODUCT = "Продан";
+    private static final String NO_DATA = "Неизвестно";
+    private static final String ZERO_DISCOUNT = "0 %";
+    private static final String PAGE_SIZE = "pagesize=100";
+    private static final String PAGE = "page=";
 
     private static Map<String, Product> products = new HashMap<>();
 
@@ -27,12 +31,12 @@ public class Main {
             System.out.println("USE webparser.java [path to file with result] [link to first page of products]");
             System.exit(0);
         }
-        String link = args[1] + "?pagesize=100";
+        String link = args[1];
         System.out.println("Start getting of products from " + link);
         Document doc = null;
         try {
             doc = Jsoup
-                    .connect(link).userAgent("Mozilla/5.0").get();
+                    .connect(link + "?" + PAGE_SIZE).timeout(0).userAgent("Mozilla/5.0").get();
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(-1);
@@ -44,26 +48,30 @@ public class Main {
             Elements elements = doc.getElementsByClass("dtList");
             for (Element element : elements) {
                 createProducts(element);
-                if (products.size() >= 25){
-                    break;
-                }
             }
-            if (products.size() >= 25){
-                break;
+            try {
+                doc = Jsoup
+                        .connect(link + "?" + PAGE_SIZE + "&" + PAGE + pageNumber).timeout(0).userAgent("Mozilla/5.0").get();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.exit(-1);
             }
         }
-        PrintWriter pw = null;
+
+        File file = new File("C:\\tmp\\test.xml");
+
         try {
-            pw = new PrintWriter(new FileOutputStream(args[0]));
-        } catch (FileNotFoundException e) {
-            System.out.println("File doesn't exist");
+            JAXBContext jaxbContext = JAXBContext.newInstance(Result.class);
+            Marshaller jaxbMarshaller;
+            jaxbMarshaller = jaxbContext.createMarshaller();
+
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            Result result = new Result(products.values(), link);
+            jaxbMarshaller.marshal(result, file);
+        } catch (JAXBException e) {
             e.printStackTrace();
-            System.exit(-1);
         }
-        System.out.println("Start saving of products to " + args[0]);
-        for (Product product : products.values())
-            pw.println(product.toString());
-        pw.close();
+
 
 
 
@@ -85,27 +93,27 @@ public class Main {
 
             Document doc = null;
             try {
-                doc = Jsoup.connect(url).userAgent("Mozilla/5.0").get();
+                doc = Jsoup.connect(url).timeout(0).userAgent("Mozilla/5.0").get();
             } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(-1);
             }
 
             product.setOrdersCount(doc.getElementsByClass("j-orders-count").text());
-            product.setCost(doc.getElementById("Price").text());
-            product.setOriginalCost(doc.getElementsByTag("del").text());
-            product.setDiscount(doc.getElementsByClass("discount").text());
+            String cost = doc.getElementById("Price").text();
+            product.setCost(cost);
+            String origCost = doc.getElementsByTag("del").text();
+            product.setOriginalCost(origCost.equals("") ? cost : origCost);
+            String discount = doc.getElementsByClass("discount").text();
+            product.setDiscount(discount.equals("") ? ZERO_DISCOUNT : discount);
 
             Elements sizes = doc.getElementsByClass("j-size");
-            Map<String, String> restCount = new HashMap<>();
+            List<RestCount> restCount = new ArrayList<>();
             for (Element size : sizes) {
-                restCount.put(size.getElementsByTag("span").get(0).text(),
-                        size.select(".goods-balance.j-low-quantity").text());
-            }
-            Elements soldSizes = doc.select(".j-size.disabled.j-sold-out");
-            for (Element size : soldSizes) {
-                restCount.put(size.getElementsByTag("span").get(0).text(),
-                        NO_PRODUCT);
+                String count = size.select(".goods-balance.j-low-quantity").text();
+                boolean notAvailable = size.attr("class").equals("j-size disabled j-sold-out");
+                restCount.add(new RestCount(size.getElementsByTag("span").get(0).text(),
+                        notAvailable ? NO_PRODUCT : count.equals("") ? NO_DATA : count));
             }
             product.setRestCount(restCount);
             products.put(article, product);
