@@ -8,10 +8,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by pryaly on 12/28/2016.
@@ -28,7 +26,7 @@ public class Main {
 
     public static void main(String[] args) {
         if (args == null || args.length != 2) {
-            System.out.println("USE webparser.java [path to file with result] [link to first page of products]");
+            System.out.println("USE webparser.java [path with name to file with result] [link to first page of products]");
             System.exit(0);
         }
         String link = args[1];
@@ -42,13 +40,9 @@ public class Main {
             System.exit(-1);
         }
 
-        int numberOfPages = (int) Math.floor(Integer.parseInt(((TextNode) doc.select(".total.many").get(0).childNode(1)
+        int numberOfPages = (int) Math.ceil(Integer.parseInt(((TextNode) doc.select(".total.many").get(0).childNode(1)
                 .childNode(0)).text()) / 100.0);
         for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
-            Elements elements = doc.getElementsByClass("dtList");
-            for (Element element : elements) {
-                createProducts(element);
-            }
             try {
                 doc = Jsoup
                         .connect(link + "?" + PAGE_SIZE + "&" + PAGE + pageNumber).timeout(0).userAgent("Mozilla/5.0").get();
@@ -56,9 +50,13 @@ public class Main {
                 e.printStackTrace();
                 System.exit(-1);
             }
+            Elements elements = doc.getElementsByClass("dtList");
+            for (Element element : elements) {
+                createProducts(element);
+            }
         }
 
-        File file = new File("C:\\tmp\\test.xml");
+        File file = new File(args[0]);
 
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(Result.class);
@@ -66,7 +64,9 @@ public class Main {
             jaxbMarshaller = jaxbContext.createMarshaller();
 
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            Result result = new Result(products.values(), link);
+            Date d = new Date();
+            SimpleDateFormat format1 = new SimpleDateFormat("dd.MM.yyyy");
+            Result result = new Result(products.values(), link, format1.format(d));
             jaxbMarshaller.marshal(result, file);
         } catch (JAXBException e) {
             e.printStackTrace();

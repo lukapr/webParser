@@ -21,4 +21,7 @@ public class Result {
 
     @XmlAttribute
     private String href;
+
+    @XmlAttribute
+    private String date;
 }
