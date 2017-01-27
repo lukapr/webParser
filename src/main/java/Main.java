@@ -22,7 +22,7 @@ public class Main {
     private static final String PAGE_SIZE = "pagesize=100";
     private static final String PAGE = "page=";
 
-    private static Map<String, Product> products = new HashMap<>();
+    private static final Set<String> fullArticles = new HashSet<>();
 
     public static void main(String[] args) {
         if (args == null || args.length != 2) {
@@ -40,20 +40,38 @@ public class Main {
             System.exit(-1);
         }
 
-        int numberOfPages = (int) Math.ceil(Integer.parseInt(((TextNode) doc.select(".total.many").get(0).childNode(1)
-                .childNode(0)).text()) / 100.0);
-        for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
+
+        Elements ul = doc.select(".selected.hasnochild").get(0).getElementsByTag("ul");
+        Elements categories = ul.size() > 0 ? ul.get(0).getElementsByTag("a") : doc.select(".selected.hasnochild").get(0).children();
+        List<Category> categoriesList = new ArrayList<>();
+        for (Element categoryElement : categories) {
+            Category category = new Category();
+            category.setName(categoryElement.text());
+            String href = BASE_URL + categoryElement.attr("href");
             try {
                 doc = Jsoup
-                        .connect(link + "?" + PAGE_SIZE + "&" + PAGE + pageNumber).timeout(0).userAgent("Mozilla/5.0").get();
+                        .connect(href + "?" + PAGE_SIZE).timeout(0).userAgent("Mozilla/5.0").get();
             } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(-1);
             }
-            Elements elements = doc.getElementsByClass("dtList");
-            for (Element element : elements) {
-                createProducts(element);
+
+            int numberOfPages = (int) Math.ceil(Integer.parseInt(((TextNode) doc.select(".total.many").get(0).childNode(1)
+                    .childNode(0)).text()) / 100.0);
+            for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
+                try {
+                    doc = Jsoup
+                            .connect(href + "?" + PAGE_SIZE + "&" + PAGE + pageNumber).timeout(0).userAgent("Mozilla/5.0").get();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.exit(-1);
+                }
+                Elements elements = doc.getElementsByClass("dtList");
+                for (Element element : elements) {
+                    category.addProducts(createProducts(element));
+                }
             }
+            categoriesList.add(category);
         }
 
         File file = new File(args[0]);
@@ -66,7 +84,7 @@ public class Main {
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             Date d = new Date();
             SimpleDateFormat format1 = new SimpleDateFormat("dd.MM.yyyy");
-            Result result = new Result(products.values(), link, format1.format(d));
+            Result result = new Result(categoriesList, link, format1.format(d));
             jaxbMarshaller.marshal(result, file);
         } catch (JAXBException e) {
             e.printStackTrace();
@@ -77,14 +95,16 @@ public class Main {
 
     }
 
-    protected static void createProducts(Element element) {
+    protected static List<Product> createProducts(Element element) {
+        List<Product> products = new ArrayList<>();
         String[] articles = element.getElementsByAttribute("data-colors").attr("data-colors").split(",");
         for (String article : articles) {
             System.out.println("Start getting info for product with article " + article);
-            if (products.containsKey(article)) {
+            if (fullArticles.contains(article)) {
                 System.out.println("Product with this article already extracted");
                 continue;
             }
+            fullArticles.add(article);
             Product product = new Product();
             product.setArticle(article);
             String url = createUrl(article);
@@ -116,9 +136,9 @@ public class Main {
                         notAvailable ? NO_PRODUCT : count.equals("") ? NO_DATA : count));
             }
             product.setRestCount(restCount);
-            products.put(article, product);
+            products.add(product);
         }
-
+        return products;
     }
 
     private static String createUrl(String color) {

@@ -16,8 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Result {
-    @XmlElement(name = "product")
-    private Collection<Product> products;
+    @XmlElement(name = "category")
+    private Collection<Category> products;
 
     @XmlAttribute
     private String href;
