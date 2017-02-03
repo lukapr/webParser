@@ -1,3 +1,4 @@
+import org.apache.log4j.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,22 +25,18 @@ public class Main {
 
     private static final Set<String> fullArticles = new HashSet<>();
 
-    public static void main(String[] args) {
+    static Logger logger = Logger.getLogger(Main.class);
+
+    public static void main(String[] args) throws InterruptedException {
+
         if (args == null || args.length != 2) {
             System.out.println("USE webparser.java [path with name to file with result] [link to first page of products]");
             System.exit(0);
         }
         String link = args[1];
-        System.out.println("Start getting of products from " + link);
-        Document doc = null;
-        try {
-            doc = Jsoup
-                    .connect(link + "?" + PAGE_SIZE).timeout(0).userAgent("Mozilla/5.0").get();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
+        logger.info("Start getting of products from " + link);
 
+        Document doc = getDoc(link + "?" + PAGE_SIZE);
 
         Elements ul = doc.select(".selected.hasnochild").get(0).getElementsByTag("ul");
         Elements categories = ul.size() > 0 ? ul.get(0).getElementsByTag("a") : doc.select(".selected.hasnochild").get(0).children();
@@ -48,24 +45,12 @@ public class Main {
             Category category = new Category();
             category.setName(categoryElement.text());
             String href = BASE_URL + categoryElement.attr("href");
-            try {
-                doc = Jsoup
-                        .connect(href + "?" + PAGE_SIZE).timeout(0).userAgent("Mozilla/5.0").get();
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
+            doc = getDoc(href + "?" + PAGE_SIZE);
 
             int numberOfPages = (int) Math.ceil(Integer.parseInt(((TextNode) doc.select(".total.many").get(0).childNode(1)
                     .childNode(0)).text()) / 100.0);
             for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
-                try {
-                    doc = Jsoup
-                            .connect(href + "?" + PAGE_SIZE + "&" + PAGE + pageNumber).timeout(0).userAgent("Mozilla/5.0").get();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.exit(-1);
-                }
+                doc = getDoc(href + "?" + PAGE_SIZE + "&" + PAGE + pageNumber);
                 Elements elements = doc.getElementsByClass("dtList");
                 for (Element element : elements) {
                     category.addProducts(createProducts(element));
@@ -87,21 +72,42 @@ public class Main {
             Result result = new Result(categoriesList, link, format1.format(d));
             jaxbMarshaller.marshal(result, file);
         } catch (JAXBException e) {
-            e.printStackTrace();
+            logger.error("Error during generating xml: ", e);
         }
-
-
-
-
     }
 
-    protected static List<Product> createProducts(Element element) {
+    private static Document getDoc(String link) throws InterruptedException {
+        Document doc = null;
+        IOException lastError = null;
+        for (int i = 0; i < 3; i++) {
+            try {
+                doc = Jsoup.connect(link).timeout(0).userAgent("Mozilla/5.0").get();
+            } catch (IOException e) {
+                doc = null;
+                lastError = e;
+                logger.info("Exception during getting page: ", e);
+                logger.info("Sleep 2 seconds");
+                Thread.sleep(2000);
+                logger.info("Try to get info again");
+            }
+            if (doc != null) {
+                break;
+            }
+        }
+        if (doc == null) {
+            logger.error("Exception during getting page: ", lastError);
+            System.exit(-1);
+        }
+        return doc;
+    }
+
+    protected static List<Product> createProducts(Element element) throws InterruptedException {
         List<Product> products = new ArrayList<>();
         String[] articles = element.getElementsByAttribute("data-colors").attr("data-colors").split(",");
         for (String article : articles) {
-            System.out.println("Start getting info for product with article " + article);
+            logger.info("Start getting info for product with article " + article);
             if (fullArticles.contains(article)) {
-                System.out.println("Product with this article already extracted");
+                logger.info("Product with this article already extracted");
                 continue;
             }
             fullArticles.add(article);
@@ -111,13 +117,7 @@ public class Main {
             product.setHref(url);
             product.setName(element.getElementsByClass("brand-name").text());
 
-            Document doc = null;
-            try {
-                doc = Jsoup.connect(url).timeout(0).userAgent("Mozilla/5.0").get();
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(-1);
-            }
+            Document doc = getDoc(url);
 
             product.setOrdersCount(doc.getElementsByClass("j-orders-count").text());
             String cost = doc.getElementById("Price").text();
