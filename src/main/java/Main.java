@@ -40,26 +40,21 @@ public class Main {
 
         Document doc = getDoc(link + "?" + PAGE_SIZE);
 
-        Elements ul = doc.select(".selected.hasnochild").get(0).getElementsByTag("ul");
-        Elements categories = ul.size() > 0 ? ul.get(0).getElementsByTag("a") : doc.select(".selected.hasnochild").get(0).children();
+        Elements childs = doc.select(".selected.hasnochild");
         List<Category> categoriesList = new ArrayList<>();
-        for (Element categoryElement : categories) {
-            Category category = new Category();
-            category.setName(categoryElement.text());
-            String href = BASE_URL + categoryElement.attr("href");
-            doc = getDoc(href + "?" + PAGE_SIZE);
+        if (childs.size() > 0) {
+            Elements ul = childs.get(0).getElementsByTag("ul");
+            Elements categories = ul.size() > 0 ? ul.get(0).getElementsByTag("a") : doc.select(".selected.hasnochild").get(0).children();
 
-            int numberOfPages = (int) Math.ceil(Integer.parseInt(((TextNode) doc.select(".total.many").get(0).childNode(1)
-                    .childNode(0)).text()) / 100.0);
-            for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
-                doc = getDoc(href + "?" + PAGE_SIZE + "&" + PAGE + pageNumber);
-                Elements elements = doc.getElementsByClass("dtList");
-                for (Element element : elements) {
-                    category.addProducts(createProducts(element));
-                }
+            for (Element categoryElement : categories) {
+
+                categoriesList.add(createCategory(categoryElement.text(), BASE_URL + categoryElement.attr("href")));
             }
-            categoriesList.add(category);
+        } else {
+            categoriesList.add(createCategory(doc.getElementById("catalog-content").getElementsByTag("h1").get(0).text(), link));
         }
+
+
 
         File file = new File(args[0]);
 
@@ -76,6 +71,24 @@ public class Main {
         } catch (JAXBException e) {
             logger.error("Error during generating xml: ", e);
         }
+    }
+
+    private static Category createCategory(String name, String link) throws InterruptedException {
+        Category category = new Category();
+        category.setName(name);
+        String href = link;
+        Document doc = getDoc(href + "?" + PAGE_SIZE);
+
+        int numberOfPages = (int) Math.ceil(Integer.parseInt(((TextNode) doc.select(".total.many").get(0).childNode(1)
+                .childNode(0)).text()) / 100.0);
+        for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
+            doc = getDoc(href + "?" + PAGE_SIZE + "&" + PAGE + pageNumber);
+            Elements elements = doc.getElementsByClass("dtList");
+            for (Element element : elements) {
+                category.addProducts(createProducts(element));
+            }
+        }
+        return category;
     }
 
     private static void prepareLogger(String fileName) {
