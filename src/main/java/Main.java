@@ -33,6 +33,8 @@ public class Main {
             System.out.println("USE webparser.java [path with name to file with result] [link to first page of products]");
             System.exit(0);
         }
+
+        prepareLogger(args[0]);
         String link = args[1];
         logger.info("Start getting of products from " + link);
 
@@ -76,6 +78,39 @@ public class Main {
         }
     }
 
+    private static void prepareLogger(String fileName) {
+        // creates pattern layout
+        PatternLayout layout = new PatternLayout();
+        String conversionPattern = "%-7p %d [%t] %c %x - %m%n";
+        layout.setConversionPattern(conversionPattern);
+
+        // creates console appender
+        ConsoleAppender consoleAppender = new ConsoleAppender();
+        consoleAppender.setLayout(layout);
+        consoleAppender.activateOptions();
+
+        // creates file appender
+        FileAppender fileAppenderError = new FileAppender();
+        fileAppenderError.setFile(fileName + "errorlogs.txt");
+        fileAppenderError.setLayout(layout);
+        fileAppenderError.activateOptions();
+
+//        FileAppender fileAppender = new FileAppender();
+//        fileAppender.setFile(fileName + "infologs.txt");
+//        fileAppender.setLayout(layout);
+//        fileAppender.activateOptions();
+
+        // configures the root logger
+        Logger rootLogger = Logger.getRootLogger();
+        rootLogger.setLevel(Level.ERROR);
+        rootLogger.addAppender(consoleAppender);
+//        rootLogger.addAppender(fileAppender);
+        rootLogger.addAppender(fileAppenderError);
+
+        // creates a custom logger and log messages
+        logger = Logger.getLogger(Main.class);
+    }
+
     private static Document getDoc(String link) throws InterruptedException {
         Document doc = null;
         IOException lastError = null;
@@ -83,6 +118,7 @@ public class Main {
             try {
                 doc = Jsoup.connect(link).timeout(0).userAgent("Mozilla/5.0").get();
             } catch (IOException e) {
+                logger.error("Exception during getting page: ", e);
                 doc = null;
                 lastError = e;
                 logger.info("Exception during getting page: ", e);
@@ -95,7 +131,7 @@ public class Main {
             }
         }
         if (doc == null) {
-            logger.error("Exception during getting page: ", lastError);
+            logger.error("LAST Exception during getting page: ", lastError);
             System.exit(-1);
         }
         return doc;
