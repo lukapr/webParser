@@ -11,6 +11,7 @@ import javax.xml.bind.Marshaller;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by pryaly on 12/28/2016.
@@ -66,7 +67,8 @@ public class Main {
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             Date d = new Date();
             SimpleDateFormat format1 = new SimpleDateFormat("dd.MM.yyyy");
-            Result result = new Result(categoriesList, link, format1.format(d));
+            Result result = new Result(categoriesList.stream().filter(v -> v.getProducts() == null)
+                    .collect(Collectors.toList()), link, format1.format(d));
             jaxbMarshaller.marshal(result, file);
         } catch (JAXBException e) {
             logger.error("Error during generating xml: ", e);
@@ -78,6 +80,10 @@ public class Main {
         category.setName(name);
         String href = link;
         Document doc = getDoc(href + "?" + PAGE_SIZE);
+
+        if (doc.getElementById("divGoodsNotFound") != null) {
+            return category;
+        }
 
         int numberOfPages = (int) Math.ceil(Integer.parseInt(((TextNode) doc.select(".total.many").get(0).childNode(1)
                 .childNode(0)).text()) / 100.0);
