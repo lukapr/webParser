@@ -67,7 +67,7 @@ public class Main {
             jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
             Date d = new Date();
             SimpleDateFormat format1 = new SimpleDateFormat("dd.MM.yyyy");
-            Result result = new Result(categoriesList.stream().filter(v -> v.getProducts() == null)
+            Result result = new Result(categoriesList.stream().filter(v -> v.getProducts() != null)
                     .collect(Collectors.toList()), link, format1.format(d));
             jaxbMarshaller.marshal(result, file);
         } catch (JAXBException e) {
