@@ -1,0 +1,40 @@
+{
+  "name": "webparser",
+  "version": "1.0.0",
+  "description": "parser for Wildberries",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukapr/webParser.git"
+  },
+  "keywords": [
+    "ReactJS",
+    "Wildberris"
+  ],
+  "author": "pryaly",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lukapr/webParser/issues"
+  },
+  "homepage": "https://github.com/lukapr/webParser#readme",
+  "dependencies": {
+    "dialog-polyfill": "^0.4.9",
+    "material-design-lite": "^1.3.0",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "toastr": "^2.1.2"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
+    "gulp": "^3.9.1",
+    "object-assign": "^4.1.1",
+    "vinyl-source-stream": "^1.1.0",
+    "react-modal-dialog": "^4.0.7"
+  }
+}
