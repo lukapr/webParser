@@ -1,101 +1,113 @@
 import React, {PropTypes} from 'react';
-import {ModalContainer, ModalDialog} from 'react-modal-dialog';
+import {Dialog, Textfield, DialogActions, DialogContent, Button} from 'react-mdl';
+
+import request from 'superagent';
+import {notify} from 'react-notify-toast';
 
 class NewConfigForm extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
-            formValues: {}
+            name: "",
+            description: "",
+            link: ""
         };
-
-        this.handleChange = this.handleChange.bind(this);
+        this.handleOpenDialog = this.handleOpenDialog.bind(this);
+        this.handleCloseDialog = this.handleCloseDialog.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleChange(event) {
-        let formValues = this.state.formValues;
-        let name = event.target.name;
-        let value = event.target.value;
+    handleOpenDialog() {
+        this.setState({
+            openDialog: true
+        });
+    }
 
-        formValues[name] = value;
-
-        this.setState({formValues})
+    handleCloseDialog() {
+        this.setState({
+            openDialog: false
+        });
+        this.props.onClose();
     }
 
     handleSubmit(event) {
-        $.ajax({
-            type: "POST",
-            url: "/configs",
-            data: JSON.stringify({
-                "name": this.state.formValues["configname"],
-                "description": this.state.formValues["description"],
-                "link": this.state.formValues["link"]
-            }),
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': ' application/json'
-            },
-            success: function (result) {
-                alert('A new config was submitted: ' + result);
-                this.props.onClose();
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                toastr.error(xhr.responseJSON.message);
-            },
-            dataType: 'json'
-        });
-
+        // $.ajax({
+        //     type: "POST",
+        //     url: "/configs",
+        //     data: JSON.stringify({
+        //         "name": this.state.name,
+        //         "description": this.state.description,
+        //         "link": this.state.link
+        //     }),
+        //     headers: {
+        //         'Accept': 'application/json',
+        //         'Content-Type': ' application/json'
+        //     },
+        //     success: function (result) {
+        //         alert('A new config was submitted: ' + result);
+        //         this.handleCloseDialog();
+        //     },
+        //     error: function (xhr, ajaxOptions, thrownError) {
+        //         // toastr.error(xhr.responseJSON.message);
+        //         this.handleCloseDialog();
+        //     },
+        //     dataType: 'json'
+        // });
+        request.delete("configs/")
+            .end(function(err, res){
+                if (err || !res.ok) {
+                    notify.show('Oh no! error', "error");
+                } else {
+                    notify.show('yay got ' + JSON.stringify(res.body), "success");
+                }
+            });
         event.preventDefault();
-    }
-
+    };
 
 
     render() {
         return (
-            {/*<dialog className="mdl-dialog">*/}
-            <ModalContainer onClose={this.props.onClose}>
-                <ModalDialog onClose={this.props.onClose} width={350} className="example-dialog"
-                             dismissOnBackgroundClick={false}>
-                    <div className="container">
-                        <form onSubmit={this.handleSubmit} className="form-horizontal">
-                            <div className="form-group ">
-                                <label className="control-label col-sm-2">Name of config: </label>
-                                <div className="col-sm-4">
-                                    <input type="text" className="form-control" name="configname"
-                                           value={this.state.formValues["configname"]}
-                                           onChange={this.handleChange}/>
-                                </div>
-                            </div>
-                            <div className="form-group ">
-                                <label className="control-label col-sm-2">Description of config: </label>
-                                <div className="col-sm-4">
-                                    <input type="text" className="form-control" name="description"
-                                           value={this.state.formValues["description"]}
-                                           onChange={this.handleChange}/>
-                                </div>
-                            </div>
-                            <div className="form-group ">
-                                <label className="control-label col-sm-2">Link of config: </label>
-                                <div className="col-sm-4">
-                                    <input type="text" className="form-control" name="link"
-                                           value={this.state.formValues["link"]}
-                                           onChange={this.handleChange}/>
-                                </div>
-                            </div>
-                            <div className="form-group">
-                                <div className="col-sm-offset-2 col-sm-10">
-                                    <button type="submit" className="btn btn-default">Submit</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </ModalDialog>
-            </ModalContainer>
+            <div>
+                <Button colored onClick={this.handleOpenDialog} raised ripple>Add new</Button>
+                <Dialog open={this.state.openDialog}>
+                    <DialogContent>
+                        <Textfield
+                            onChange={(event) => {
+                                this.setState({name: event.target.value})
+                            }}
+                            label="Name..."
+                            floatingLabel
+                            // style={{width: '200px'}}
+                        />
+                        <Textfield
+                            onChange={(event) => {
+                                this.setState({description: event.target.value})
+                            }}
+                            label="Description..."
+                            floatingLabel
+                            // style={{width: '200px'}}
+                        />
+                        <Textfield
+                            onChange={(event) => {
+                                this.setState({link: event.target.value})
+                            }}
+                            label="Link..."
+                            floatingLabel
+                            // style={{width: '200px'}}
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button type='button' onClick={this.handleSubmit}>Submit</Button>
+                        <Button type='button' onClick={this.handleCloseDialog}>Cancel</Button>
+                    </DialogActions>
+                </Dialog>
+            </div>
         );
     }
-}
+};
 
-NewConfigForm.propTypes =  {
+NewConfigForm.propTypes = {
     onClose: PropTypes.func,
 };
 
