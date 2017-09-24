@@ -23,7 +23,11 @@ class ConfigDialog extends React.Component {
     handleClose = () => {
         this.setState({
             openDialog: false,
-            isEdit: false
+            isEdit: false,
+            name: "",
+            description: "",
+            link: "",
+            id: ""
         });
         this.props.onClose();
     };
@@ -86,7 +90,7 @@ class ConfigDialog extends React.Component {
     render() {
 
         const customContentStyle = {
-            width: '45%',
+            width: '35%',
             maxWidth: 'none',
         };
 
@@ -117,6 +121,7 @@ class ConfigDialog extends React.Component {
                         hintText="Name"
                         floatingLabelText="Name"
                         value={this.state.name}
+                        fullWidth={true}
                     /><br/>
                     <TextField
                         onChange={(event) => {
@@ -128,6 +133,7 @@ class ConfigDialog extends React.Component {
                         rows={1}
                         rowsMax={4}
                         value={this.state.description}
+                        fullWidth={true}
                     /><br/>
                     <TextField
                         onChange={(event) => {
@@ -136,6 +142,7 @@ class ConfigDialog extends React.Component {
                         hintText="Link"
                         floatingLabelText="Link"
                         value={this.state.link}
+                        fullWidth={true}
                     />
                 </Dialog>
             </div>

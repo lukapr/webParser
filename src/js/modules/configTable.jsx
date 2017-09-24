@@ -20,15 +20,15 @@ class ConfigTable extends Component {
             )
         });
         return (
-            <div style={{width: '100%'}}>
-                <Table fixedHeader={false} style={{ tableLayout: 'auto'}}>
+            <div style={{width: '100%', paddingTop: '10px', paddingBottom: '10px'}}>
+                <Table fixedHeader={false} style={{ tableLayout: 'auto'}} wrapperStyle={{ maxHeight: '300px' }}>
                     <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
                         <TableRow >
                             <TableHeaderColumn>Name</TableHeaderColumn>
                             <TableHeaderColumn>Description</TableHeaderColumn>
                             <TableHeaderColumn>Link</TableHeaderColumn>
-                            <TableHeaderColumn>Delete?</TableHeaderColumn>
-                            <TableHeaderColumn>Change?</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '5%'}}>Delete?</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '5%'}}>Change?</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>

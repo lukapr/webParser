@@ -36,7 +36,7 @@ public class ConfigController {
     @RequestMapping(method = RequestMethod.GET)
     public List<Config> listConfiguration() throws Exception {
         LOG.info("listConfiguration()");
-        return (List<Config>) this.getRepository().findAll();
+        return this.getRepository().findAllByOrderByLastupdatedDesc();
     }
 
     @RequestMapping(method = RequestMethod.POST)

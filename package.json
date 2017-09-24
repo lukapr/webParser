@@ -21,6 +21,9 @@
   },
   "homepage": "https://github.com/lukapr/webParser#readme",
   "dependencies": {
+    "@devexpress/dx-react-core": "^1.0.0-alpha.10",
+    "@devexpress/dx-react-grid": "^1.0.0-alpha.10",
+    "@devexpress/dx-react-grid-material-ui": "^1.0.0-alpha.10",
     "dialog-polyfill": "^0.4.9",
     "jquery": "^3.2.1",
     "material-design-lite": "^1.3.0",

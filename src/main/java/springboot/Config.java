@@ -3,8 +3,11 @@ package springboot;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -18,4 +21,8 @@ public class Config {
     private String name;
     private String description;
     private String link;
+    @CreationTimestamp
+    private Date createdon;
+    @UpdateTimestamp
+    private Date lastupdated;
 }

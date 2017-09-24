@@ -3,7 +3,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import ConfigDialog from './dialog';
 
 
-class NewConfigForm extends React.Component {
+class NewConfigButton extends React.Component {
 
     constructor(props) {
         super(props);
@@ -28,16 +28,16 @@ class NewConfigForm extends React.Component {
     render() {
         return (
             <div>
-                <RaisedButton label="Add new Config" primary={true} onClick={this.handleOpen}/>
+                <RaisedButton style={{float: 'right'}} label="Add new Config" primary={true} onClick={this.handleOpen}/>
                 <ConfigDialog onClose={this.handleClose} isOpen={this.state.openDialog} title={"Add new config"}/>
             </div>
         );
     }
 };
 
-NewConfigForm
+NewConfigButton
     .propTypes = {
     onClose: PropTypes.func,
 };
 
-export default NewConfigForm;
+export default NewConfigButton;

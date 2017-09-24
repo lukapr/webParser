@@ -1,63 +1,48 @@
 import React, {Component} from 'react';
-import NewConfigForm from "./newConfigForm";
-import ConfigTable from "./configTable";
-import Notifications, {notify} from 'react-notify-toast';
-import {GridList} from 'material-ui/GridList';
-
-import request from 'superagent';
+import Notifications from 'react-notify-toast';
+import {Tabs, Tab} from 'material-ui/Tabs';
+import ConfigsInfo from './configsInfo'
 
 const styles = {
-    root: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around',
-    },
-    gridList: {
-        width: 500,
-        height: 450,
-        overflowY: 'auto',
+    headline: {
+        fontSize: 24,
+        paddingTop: 16,
+        marginBottom: 12,
+        fontWeight: 400,
     },
 };
 
 export default class Index extends Component {
+
     constructor(props) {
         super(props);
         this.state = {
-            configs: []
+            value: 'home',
         };
-        this.loadConfigsFromServer = this.loadConfigsFromServer.bind(this);
-        // this.componentDidMount().bind(this);
-    };
+    }
 
-    loadConfigsFromServer = () => {
-        request.get("configs/")
-            .end((err, res) => {
-                if (err || !res.ok) {
-                    notify.show('Error during getting configs: ' + err, "error");
-                    this.setState({
-                        configs: [{id: "1", name: "name", description: "desc", link: "link"},
-                            {id: "2", name: "name11", description: "desc", link: "link"}]
-                    });
-                } else {
-                    // notify.show('yay got ' + JSON.stringify(res.body), "success");
-                    this.setState({configs: res.body})
-                }
-            })
-    };
-
-    componentDidMount() {
-        this.loadConfigsFromServer();
+    handleChange = (value) => {
+        this.setState({
+            value: value,
+        });
     };
 
     render() {
         return ( <div style={{width: '60%', margin: 'auto'}}>
             <Notifications/>
-            <ConfigTable configs={this.state.configs} onEdit={this.loadConfigsFromServer}/>
-            <GridList
-                padding={-20}
-            />
-            <NewConfigForm onClose={this.loadConfigsFromServer} title={"Add new config"}/>
+            <Tabs
+                value={this.state.value}
+                onChange={this.handleChange}
+            >
+                <Tab label="Home"  value="home">
+                    <h2>Home</h2>
+                </Tab>
+                <Tab label="Configs" value="configs">
+                    <ConfigsInfo load={this.state.value === "configs"}/>
+                </Tab>
+            </Tabs>
         </div>)
             ;
     }
+
 }
