@@ -2,9 +2,7 @@ import React, {Component} from 'react';
 import NewConfigForm from "./newConfigForm";
 import ConfigTable from "./configTable";
 import Notifications, {notify} from 'react-notify-toast';
-import {GridList, GridTile} from 'material-ui/GridList';
-import IconButton from 'material-ui/IconButton';
-import StarBorder from 'material-ui/svg-icons/toggle/star-border';
+import {GridList} from 'material-ui/GridList';
 
 import request from 'superagent';
 
@@ -37,8 +35,8 @@ export default class Index extends Component {
                 if (err || !res.ok) {
                     notify.show('Error during getting configs: ' + err, "error");
                     this.setState({
-                        configs: [{name: "name11111111111111111111111111111111", description: "desc", link: "link"},
-                            {name: "name", description: "desc", link: "link"}]
+                        configs: [{id: "1", name: "name", description: "desc", link: "link"},
+                            {id: "2", name: "name11", description: "desc", link: "link"}]
                     });
                 } else {
                     // notify.show('yay got ' + JSON.stringify(res.body), "success");
@@ -53,13 +51,13 @@ export default class Index extends Component {
 
     render() {
         return ( <div style={{width: '60%', margin: 'auto'}}>
-        <Notifications/>
-        <ConfigTable configs={this.state.configs}/>
+            <Notifications/>
+            <ConfigTable configs={this.state.configs} onEdit={this.loadConfigsFromServer}/>
             <GridList
                 padding={-20}
             />
-        <NewConfigForm onClose={this.loadConfigsFromServer}/>
-    </div>)
-        ;
+            <NewConfigForm onClose={this.loadConfigsFromServer} title={"Add new config"}/>
+        </div>)
+            ;
     }
 }

@@ -46,6 +46,12 @@ public class ConfigController {
         return result.getId();
     }
 
+    @RequestMapping(method = RequestMethod.PUT)
+    public Long updateConfiguration(@RequestBody Config resultConfig) {
+        Config result = this.getRepository().save(resultConfig);
+        return result.getId();
+    }
+
     public ConfigRepository getRepository() {
         return repository;
     }

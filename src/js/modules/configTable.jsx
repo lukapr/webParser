@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
+import React, {Component, PropTypes} from 'react';
 import Config from './config';
 import {
     Table,
     TableBody,
     TableHeader,
     TableHeaderColumn,
-    TableRow,
+    TableRow
 } from 'material-ui/Table';
 
 class ConfigTable extends Component {
@@ -15,19 +15,20 @@ class ConfigTable extends Component {
 
     render() {
         const result = [];
-        this.props.configs.forEach(function (config) {
-            result.push(<Config config={config} key={config.name}/>
+        this.props.configs.forEach((config) => {
+            result.push(<Config config={config} key={config.id} onEdit={this.props.onEdit}/>
             )
         });
         return (
             <div style={{width: '100%'}}>
-                <Table>
+                <Table fixedHeader={false} style={{ tableLayout: 'auto'}}>
                     <TableHeader adjustForCheckbox={false} displaySelectAll={false}>
-                        <TableRow>
+                        <TableRow >
                             <TableHeaderColumn>Name</TableHeaderColumn>
                             <TableHeaderColumn>Description</TableHeaderColumn>
                             <TableHeaderColumn>Link</TableHeaderColumn>
                             <TableHeaderColumn>Delete?</TableHeaderColumn>
+                            <TableHeaderColumn>Change?</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>
@@ -37,6 +38,10 @@ class ConfigTable extends Component {
             </div>
         )
     }
+}
+
+ConfigTable.propTypes = {
+    onEdit: PropTypes.func
 }
 
 export default ConfigTable;
