@@ -52,9 +52,33 @@ class Config extends Component {
                     this.setState({parsing: false});
                 } else {
                     notify.show('Parsing started', "success");
-                    this.setState({parsing: false});
+                    this.setState({
+                        taskId: res.body
+                    });
+                    this.counter = setInterval(this.checkResult, 1000);
                 }
             });
+    };
+
+    checkResult = () => {
+        request.get("tasks/" + this.state.taskId)
+            .end((err, res) => {
+                if (err || !res.ok) {
+                    notify.show('Error during getting task: ' + err, "error");
+                    clearInterval(this.counter);
+                    this.setState({parsing: false});
+                } else {
+                    if (res.body.status === 'SUCCESS') {
+                        clearInterval(this.counter);
+                        this.setState({parsing: false});
+                        notify.show('Successfully parsed', "success");
+                    } else if (res.body.status === 'FAILED') {
+                        clearInterval(this.counter);
+                        this.setState({parsing: false});
+                        notify.show('Error during getting task: ' + err, "error");
+                    }
+                }
+            })
     };
 
 

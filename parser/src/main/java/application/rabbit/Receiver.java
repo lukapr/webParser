@@ -1,16 +1,11 @@
 package application.rabbit;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 import application.parser.Parser;
-import com.rabbitmq.client.Channel;
 import lombok.Getter;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +16,9 @@ public class Receiver {
     @Autowired
     private Parser parser;
 
+    @Autowired
+    private Producer producer;
+
     @RabbitListener(queues = "ui-request")
     public void receiveMessage(String message) {
         System.out.println("Received <" + message + ">");
@@ -30,11 +28,7 @@ public class Receiver {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        producer.sendMessage("300");
         latch.countDown();
     }
-
-    public CountDownLatch getLatch() {
-        return latch;
-    }
-
 }
