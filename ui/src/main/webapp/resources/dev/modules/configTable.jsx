@@ -29,6 +29,7 @@ class ConfigTable extends Component {
                             <TableHeaderColumn>Link</TableHeaderColumn>
                             <TableHeaderColumn style={{width: '5%'}}>Delete?</TableHeaderColumn>
                             <TableHeaderColumn style={{width: '5%'}}>Change?</TableHeaderColumn>
+                            <TableHeaderColumn style={{width: '5%'}}>Process?</TableHeaderColumn>
                         </TableRow>
                     </TableHeader>
                     <TableBody displayRowCheckbox={false}>

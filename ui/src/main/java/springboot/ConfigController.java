@@ -51,7 +51,13 @@ public class ConfigController {
         return result.getId();
     }
 
-    public ConfigRepository getRepository() {
+    @RequestMapping(value = "/process/{id}", method = RequestMethod.POST)
+    public boolean processConfiguration(@PathVariable("id") Long id) throws Exception {
+        LOG.info("processConfiguration() with id = " + id);
+        return false;
+    }
+
+    private ConfigRepository getRepository() {
         return repository;
     }
 }

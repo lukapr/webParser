@@ -8,7 +8,7 @@ import {
 import IconButton from 'material-ui/IconButton';
 import ActionDelete from 'material-ui/svg-icons/action/delete'
 import EditorModeEdit from 'material-ui/svg-icons/editor/mode-edit'
-import NewConfigForm from "./newConfigForm";
+import AvPlayArrow from 'material-ui/svg-icons/av/play-arrow'
 import ConfigDialog from "./dialog";
 
 class Config extends Component {
@@ -33,13 +33,23 @@ class Config extends Component {
     };
 
     handleOpen = () => {
-        console.log("AAAA");
         this.setState({edit: true});
     };
 
     handleClose = () => {
         this.setState({edit: false});
         this.props.onEdit();
+    };
+
+    handleProcess = () => {
+        request.post("configs/process/" + this.props.config.id)
+            .end((err, res) => {
+                if (err || !res.ok) {
+                    notify.show('Error during processing: ' + err, "error");
+                } else {
+                    notify.show('yay got ' + JSON.stringify(res.body), "success");
+                }
+            });
     };
 
 
@@ -59,6 +69,11 @@ class Config extends Component {
                                   config={this.props.config}/>
                     <IconButton onClick={this.handleOpen}>
                         <EditorModeEdit/>
+                    </IconButton>
+                </TableRowColumn>
+                <TableRowColumn>
+                    <IconButton onClick={this.handleProcess}>
+                        <AvPlayArrow/>
                     </IconButton>
                 </TableRowColumn>
             </TableRow>
