@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springboot.rabbit.Producer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +18,9 @@ public class ConfigController {
 
     @Autowired
     private ConfigRepository repository;
+
+    @Autowired
+    private Producer producer;
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public Config getConfiguration(@PathVariable("id") Long id) throws Exception {
@@ -54,6 +59,12 @@ public class ConfigController {
     @RequestMapping(value = "/process/{id}", method = RequestMethod.POST)
     public boolean processConfiguration(@PathVariable("id") Long id) throws Exception {
         LOG.info("processConfiguration() with id = " + id);
+        Config config = Optional.ofNullable(this.getRepository().findOne(id))
+                .orElseThrow(() -> new Exception("Can't find configuration with ID = " + id));
+        List<String> links = new ArrayList<String>(){{
+            add(config.getLink());
+        }};
+        producer.sendMessage(links);
         return false;
     }
 
