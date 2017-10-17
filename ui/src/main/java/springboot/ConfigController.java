@@ -61,10 +61,7 @@ public class ConfigController {
         LOG.info("processConfiguration() with id = " + id);
         Config config = Optional.ofNullable(this.getRepository().findOne(id))
                 .orElseThrow(() -> new Exception("Can't find configuration with ID = " + id));
-        List<String> links = new ArrayList<String>(){{
-            add(config.getLink());
-        }};
-        producer.sendMessage(links);
+        producer.sendMessage(config.getLink());
         return false;
     }
 

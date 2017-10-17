@@ -10,13 +10,15 @@ import ActionDelete from 'material-ui/svg-icons/action/delete'
 import EditorModeEdit from 'material-ui/svg-icons/editor/mode-edit'
 import AvPlayArrow from 'material-ui/svg-icons/av/play-arrow'
 import ConfigDialog from "./dialog";
+import CircularProgress from 'material-ui/CircularProgress';
 
 class Config extends Component {
     constructor(props) {
         super(props);
         this.state = {
             display: true,
-            edit: false
+            edit: false,
+            parsing: false
         };
     };
 
@@ -42,12 +44,15 @@ class Config extends Component {
     };
 
     handleProcess = () => {
+        this.setState({parsing: true});
         request.post("configs/process/" + this.props.config.id)
             .end((err, res) => {
                 if (err || !res.ok) {
                     notify.show('Error during processing: ' + err, "error");
+                    this.setState({parsing: false});
                 } else {
-                    notify.show('yay got ' + JSON.stringify(res.body), "success");
+                    notify.show('Parsing started', "success");
+                    this.setState({parsing: false});
                 }
             });
     };
@@ -72,9 +77,13 @@ class Config extends Component {
                     </IconButton>
                 </TableRowColumn>
                 <TableRowColumn>
-                    <IconButton onClick={this.handleProcess}>
-                        <AvPlayArrow/>
-                    </IconButton>
+                    {
+                        (this.state.parsing) ?
+                            <CircularProgress/> :
+                            <IconButton onClick={this.handleProcess}>
+                                <AvPlayArrow/>
+                            </IconButton>
+                    }
                 </TableRowColumn>
             </TableRow>
             : null);

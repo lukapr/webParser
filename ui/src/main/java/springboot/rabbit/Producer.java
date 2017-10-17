@@ -15,8 +15,8 @@ public class Producer {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
-    public static final String QUEUE_NAME = "queue-name";
-    public void sendMessage(List<String> message) {
+    public static final String QUEUE_NAME = "ui-request";
+    public void sendMessage(String message) {
         System.out.println("Sending message...");
         getRabbitTemplate().convertAndSend(QUEUE_NAME, message);
     }

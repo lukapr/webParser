@@ -28,7 +28,7 @@ export default class Index extends Component {
     };
 
     render() {
-        return ( <div style={{width: '60%', margin: 'auto'}}>
+        return ( <div style={{width: '80%', margin: 'auto'}}>
             <Notifications/>
             <Tabs
                 value={this.state.value}

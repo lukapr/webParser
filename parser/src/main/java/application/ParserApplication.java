@@ -14,7 +14,7 @@ import application.rabbit.Receiver;
 @EnableRabbit
 public class ParserApplication {
 
-    public static final String QUEUE_NAME = "queue-name";
+    public static final String QUEUE_NAME = "ui-request";
 
     @Bean
     public Queue queue() {
