@@ -7,5 +7,4 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends CrudRepository<Task, Long> {
-    public Task findByConfig_Id(Long configId);
 }

@@ -28,7 +28,7 @@ public class Application {
         container.setConnectionFactory( connectionFactory );
         container.setQueueNames( QUEUE_NAME );
         container.setMessageListener( listenerAdapter );
-        container.setAcknowledgeMode( AcknowledgeMode.AUTO );
+        container.setAcknowledgeMode( AcknowledgeMode.NONE );
         return container;
     }
 

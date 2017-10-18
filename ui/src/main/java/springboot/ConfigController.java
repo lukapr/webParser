@@ -1,6 +1,8 @@
 package springboot;
 
 import lombok.Getter;
+import messages.RMQMessage;
+import messages.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +71,8 @@ public class ConfigController {
         task.setConfig(config);
         task.setStatus(Status.CREATED.name());
         Task result = taskRepository.save(task);
-//        RMQMessage
-        producer.sendMessage(config.getLink());
+        RMQMessage message = new RMQMessage(result.getId(), config.getLink());
+        producer.sendMessage(message);
         result.setStatus(Status.PENDING.name());
         taskRepository.save(task);
         return task.getId();

@@ -1,4 +1,4 @@
-package springboot;
+package messages;
 
 public enum Status {
     CREATED,

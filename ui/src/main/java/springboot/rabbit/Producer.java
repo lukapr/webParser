@@ -1,6 +1,7 @@
 package springboot.rabbit;
 
 import lombok.Getter;
+import messages.RMQMessage;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -16,7 +17,7 @@ public class Producer {
     @Autowired
     private RabbitTemplate rabbitTemplate;
     public static final String QUEUE_NAME = "ui-request";
-    public void sendMessage(String message) {
+    public void sendMessage(RMQMessage message) {
         System.out.println("Sending message...");
         getRabbitTemplate().convertAndSend(QUEUE_NAME, message);
     }

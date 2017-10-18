@@ -1,17 +1,21 @@
 package application;
 
+import datamodels.Category;
+import datamodels.repositories.CategoryRepository;
 import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import application.rabbit.Receiver;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableRabbit
+@EnableJpaRepositories(basePackageClasses = CategoryRepository.class)
+@EntityScan(basePackageClasses = Category.class)
 public class ParserApplication {
 
     public static final String QUEUE_NAME = "ui-request";
@@ -28,7 +32,7 @@ public class ParserApplication {
         container.setConnectionFactory( connectionFactory );
         container.setQueueNames( QUEUE_NAME );
         container.setMessageListener( listenerAdapter );
-        container.setAcknowledgeMode( AcknowledgeMode.AUTO );
+        container.setAcknowledgeMode( AcknowledgeMode.NONE );
         return container;
     }
 
