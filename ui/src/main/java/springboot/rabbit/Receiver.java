@@ -5,8 +5,8 @@ import messages.RMQMessage;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import springboot.Task;
-import springboot.TaskRepository;
+import springboot.datamodels.Task;
+import springboot.datamodels.TaskRepository;
 
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;

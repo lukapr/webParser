@@ -9,8 +9,11 @@ import IconButton from 'material-ui/IconButton';
 import ActionDelete from 'material-ui/svg-icons/action/delete'
 import EditorModeEdit from 'material-ui/svg-icons/editor/mode-edit'
 import AvPlayArrow from 'material-ui/svg-icons/av/play-arrow'
+import AlertError from 'material-ui/svg-icons/alert/error'
+import ActionDone from 'material-ui/svg-icons/action/done'
 import ConfigDialog from "./dialog";
 import CircularProgress from 'material-ui/CircularProgress';
+import {red500, green500} from 'material-ui/styles/colors';
 
 class Config extends Component {
     constructor(props) {
@@ -18,7 +21,7 @@ class Config extends Component {
         this.state = {
             display: true,
             edit: false,
-            parsing: false
+            parsing: ""
         };
     };
 
@@ -44,12 +47,12 @@ class Config extends Component {
     };
 
     handleProcess = () => {
-        this.setState({parsing: true});
+        this.setState({parsing: "PENDING"});
         request.post("configs/process/" + this.props.config.id)
             .end((err, res) => {
                 if (err || !res.ok) {
                     notify.show('Error during processing: ' + err, "error");
-                    this.setState({parsing: false});
+                    this.setState({parsing: "FAILED"});
                 } else {
                     notify.show('Parsing started', "success");
                     this.setState({
@@ -66,15 +69,16 @@ class Config extends Component {
                 if (err || !res.ok) {
                     notify.show('Error during getting task: ' + err, "error");
                     clearInterval(this.counter);
-                    this.setState({parsing: false});
+                    this.setState({parsing: "FAILED"});
                 } else {
                     if (res.body.status === 'SUCCESS') {
                         clearInterval(this.counter);
-                        this.setState({parsing: false});
+                        this.setState({parsing: "SUCCESS"});
                         notify.show('Successfully parsed', "success");
-                    } else if (res.body.status === 'FAILED') {
+                    } else if (res.body.status === 'PENDING' || res.body.status === 'CREATED') {
+                    } else {
                         clearInterval(this.counter);
-                        this.setState({parsing: false});
+                        this.setState({parsing: "FAILED"});
                         notify.show('Error during getting task: ' + err, "error");
                     }
                 }
@@ -83,6 +87,27 @@ class Config extends Component {
 
 
     render() {
+        let icon = null;
+        if (this.state.parsing === "PENDING") {
+            icon = <CircularProgress/>
+        } else {
+            icon = <IconButton onClick={this.handleProcess}>
+                <AvPlayArrow/>
+            </IconButton>
+            if (this.state.parsing === "FAILED") {
+                icon = <div><IconButton onClick={this.handleProcess}>
+                    <AvPlayArrow/>
+                </IconButton>
+                    <AlertError color={red500}/>
+                </div>
+            } else if (this.state.parsing === "SUCCESS") {
+                icon = <div><IconButton onClick={this.handleProcess}>
+                    <AvPlayArrow/>
+                </IconButton>
+                    <ActionDone color={green500}/>
+                </div>
+            }
+        }
         return ( this.state.display ?
             <TableRow>
                 <TableRowColumn>{this.props.config.name}</TableRowColumn>
@@ -101,13 +126,7 @@ class Config extends Component {
                     </IconButton>
                 </TableRowColumn>
                 <TableRowColumn>
-                    {
-                        (this.state.parsing) ?
-                            <CircularProgress/> :
-                            <IconButton onClick={this.handleProcess}>
-                                <AvPlayArrow/>
-                            </IconButton>
-                    }
+                    {icon}
                 </TableRowColumn>
             </TableRow>
             : null);

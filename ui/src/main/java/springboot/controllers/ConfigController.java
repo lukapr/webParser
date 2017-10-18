@@ -1,4 +1,4 @@
-package springboot;
+package springboot.controllers;
 
 import lombok.Getter;
 import messages.RMQMessage;
@@ -7,6 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import springboot.datamodels.Config;
+import springboot.datamodels.ConfigRepository;
+import springboot.datamodels.Task;
+import springboot.datamodels.TaskRepository;
 import springboot.rabbit.Producer;
 
 import java.util.List;

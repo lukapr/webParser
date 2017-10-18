@@ -1,4 +1,4 @@
-package springboot;
+package springboot.datamodels;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

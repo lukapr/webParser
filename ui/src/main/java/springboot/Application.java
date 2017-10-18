@@ -1,17 +1,23 @@
 package springboot;
 
+import datamodels.Category;
+import datamodels.repositories.CategoryRepository;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import springboot.datamodels.Config;
+import springboot.datamodels.ConfigRepository;
 import springboot.rabbit.Receiver;
 
 @SpringBootApplication
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackageClasses = {CategoryRepository.class, ConfigRepository.class})
+@EntityScan(basePackageClasses = {Category.class, Config.class})
 public class Application {
 
     public static final String QUEUE_NAME = "ui-response";

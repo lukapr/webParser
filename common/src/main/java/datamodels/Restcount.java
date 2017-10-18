@@ -1,17 +1,20 @@
 package datamodels;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Restcount {
+public class Restcount implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "restcount_seq_gen")
     @SequenceGenerator(name = "restcount_seq_gen", sequenceName = "restcount_id_seq")
@@ -21,6 +24,7 @@ public class Restcount {
 
     @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="statisticsid")
+    @JsonBackReference
     private Statistics statistics;
 
     public Restcount(String size, String count) {

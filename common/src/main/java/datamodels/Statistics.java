@@ -1,24 +1,31 @@
 package datamodels;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 @Data
 @Entity
-public class Statistics {
+public class Statistics implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "statistics_seq_gen")
     @SequenceGenerator(name = "statistics_seq_gen", sequenceName = "statistics_id_seq")
     private Long id;
+
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="productid")
+    @JsonBackReference
     private Product product;
+
     private Integer orderscount;
     private Double cost;
     private Double originalcost;
@@ -28,6 +35,7 @@ public class Statistics {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name="statisticsid")
+    @JsonManagedReference
     private Set<Restcount> restcount;
 
     @Override
@@ -62,7 +70,6 @@ public class Statistics {
     public String toString() {
         return "Statistics{" +
                 "id=" + id +
-                ", product=" + product +
                 ", orderscount=" + orderscount +
                 ", cost=" + cost +
                 ", originalcost=" + originalcost +

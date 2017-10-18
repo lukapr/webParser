@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Notifications from 'react-notify-toast';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import ConfigsInfo from './configsInfo'
+import Results from './results'
 
 const styles = {
     headline: {
@@ -39,6 +40,9 @@ export default class Index extends Component {
                 </Tab>
                 <Tab label="Configs" value="configs">
                     <ConfigsInfo load={this.state.value === "configs"}/>
+                </Tab>
+                <Tab label="Result" value="results">
+                    <Results  load={this.state.value === "results"}/>
                 </Tab>
             </Tabs>
         </div>)

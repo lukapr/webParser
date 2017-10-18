@@ -1,18 +1,20 @@
 package datamodels;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.*;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product {
+public class Product implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_seq_gen")
     @SequenceGenerator(name = "product_seq_gen", sequenceName = "product_id_seq")
@@ -24,11 +26,14 @@ public class Product {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
     @JoinTable(
-            name="category_product",
-            joinColumns=@JoinColumn(name="productid", referencedColumnName="id"),
-            inverseJoinColumns=@JoinColumn(name="categoryid", referencedColumnName="id"))
+            name = "category_product",
+            joinColumns = @JoinColumn(name = "productid", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "categoryid", referencedColumnName = "id"))
+    @JsonManagedReference
     private Set<Category> categories;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy="product")
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+    @JsonManagedReference
     private Set<Statistics> statistics;
 
 
