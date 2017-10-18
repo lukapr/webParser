@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
-import NewConfigButton from "./newConfigForm";
-import ConfigTable from "./configTable";
+import NewConfigButton from "./newConfigForm.jsx";
+import ConfigTable from "./configTable.jsx";
 import {notify} from 'react-notify-toast';
 
 import request from 'superagent';

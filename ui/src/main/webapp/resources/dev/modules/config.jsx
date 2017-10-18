@@ -11,7 +11,7 @@ import EditorModeEdit from 'material-ui/svg-icons/editor/mode-edit'
 import AvPlayArrow from 'material-ui/svg-icons/av/play-arrow'
 import AlertError from 'material-ui/svg-icons/alert/error'
 import ActionDone from 'material-ui/svg-icons/action/done'
-import ConfigDialog from "./dialog";
+import ConfigDialog from "./dialog.jsx";
 import CircularProgress from 'material-ui/CircularProgress';
 import {red500, green500} from 'material-ui/styles/colors';
 

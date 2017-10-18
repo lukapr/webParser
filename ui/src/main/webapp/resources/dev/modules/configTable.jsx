@@ -1,5 +1,5 @@
 import React, {Component, PropTypes} from 'react';
-import Config from './config';
+import Config from './config.jsx';
 import {
     Table,
     TableBody,

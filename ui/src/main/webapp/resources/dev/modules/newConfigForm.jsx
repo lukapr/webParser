@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
-import ConfigDialog from './dialog';
+import ConfigDialog from './dialog.jsx';
 
 
 class NewConfigButton extends React.Component {

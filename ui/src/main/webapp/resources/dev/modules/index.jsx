@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import Notifications from 'react-notify-toast';
 import {Tabs, Tab} from 'material-ui/Tabs';
-import ConfigsInfo from './configsInfo'
-import Results from './results'
+import ConfigsInfo from './configsInfo.jsx'
+import Results from './results.jsx'
 
 const styles = {
     headline: {
