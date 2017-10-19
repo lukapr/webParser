@@ -1,6 +1,5 @@
 import React, {Component, PropTypes} from 'react';
 import request from 'superagent';
-import {notify} from 'react-notify-toast';
 import {
     TableRow,
     TableRowColumn,
@@ -14,6 +13,7 @@ import ActionDone from 'material-ui/svg-icons/action/done'
 import ConfigDialog from "./dialog.jsx";
 import CircularProgress from 'material-ui/CircularProgress';
 import {red500, green500} from 'material-ui/styles/colors';
+import {ErrorNotification, SuccessNotification} from "./notifications.jsx";
 
 class Config extends Component {
     constructor(props) {
@@ -29,9 +29,9 @@ class Config extends Component {
         request.delete("configs/" + this.props.config.id)
             .end((err, res) => {
                 if (err || !res.ok) {
-                    notify.show('Error during deleting: ' + err, "error");
+                    this.refs.errorNotification.handleOpen('Error during deleting: ' + err);
                 } else {
-                    notify.show('yay got ' + JSON.stringify(res.body), "success");
+                    this.refs.successNotification.handleOpen('Successfully delete');
                     this.setState({display: false})
                 }
             });
@@ -51,10 +51,10 @@ class Config extends Component {
         request.post("configs/process/" + this.props.config.id)
             .end((err, res) => {
                 if (err || !res.ok) {
-                    notify.show('Error during processing: ' + err, "error");
+                    this.refs.errorNotification.handleOpen('Error during processing: ' + err);
                     this.setState({parsing: "FAILED"});
                 } else {
-                    notify.show('Parsing started', "success");
+                    this.refs.successNotification.handleOpen('Parsing started');
                     this.setState({
                         taskId: res.body
                     });
@@ -67,19 +67,19 @@ class Config extends Component {
         request.get("tasks/" + this.state.taskId)
             .end((err, res) => {
                 if (err || !res.ok) {
-                    notify.show('Error during getting task: ' + err, "error");
+                    this.refs.errorNotification.handleOpen('Parsing failed: ' + err);
                     clearInterval(this.counter);
                     this.setState({parsing: "FAILED"});
                 } else {
                     if (res.body.status === 'SUCCESS') {
                         clearInterval(this.counter);
                         this.setState({parsing: "SUCCESS"});
-                        notify.show('Successfully parsed', "success");
+                        this.refs.successNotification.handleOpen('Successfully parsed');
                     } else if (res.body.status === 'PENDING' || res.body.status === 'CREATED') {
                     } else {
                         clearInterval(this.counter);
                         this.setState({parsing: "FAILED"});
-                        notify.show('Error during getting task: ' + err, "error");
+                        this.refs.errorNotification.handleOpen('Parsing failed');
                     }
                 }
             })
@@ -114,6 +114,8 @@ class Config extends Component {
                 <TableRowColumn>{this.props.config.description}</TableRowColumn>
                 <TableRowColumn>{this.props.config.link}</TableRowColumn>
                 <TableRowColumn>
+                    <ErrorNotification ref='errorNotification'/>
+                    <SuccessNotification ref='successNotification'/>
                     <IconButton onClick={this.handleDelete}>
                         <ActionDelete/>
                     </IconButton>

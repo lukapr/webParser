@@ -4,7 +4,7 @@
   "description": "parser for Wildberries",
   "main": "index.js",
   "scripts": {
-    "start": "webpack"
+    "start": "webpack --progress --colors --watch"
   },
   "repository": {
     "type": "git",

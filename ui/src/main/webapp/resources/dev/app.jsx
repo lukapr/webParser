@@ -1,18 +1,13 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import Index from './modules/index.jsx'
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
-class App extends Component {
-    constructor(props) {
-        super(props);
-    };
 
-    render() {
-        return ( <MuiThemeProvider>
-            <Index/>
-        </MuiThemeProvider>);
-    }
+ReactDOM.render(<Index/>, document.getElementById('root'));
+
+if (module.hot) {
+    module.hot.accept('./modules/index.jsx', () => {
+        const NextIndex = require('./modules/index.jsx').default;
+        render(<Index />, document.getElementById('root'));
+    })
 }
-
-ReactDOM.render(<App/>, document.getElementById('root'));

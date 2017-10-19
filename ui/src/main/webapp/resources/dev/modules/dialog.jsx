@@ -2,9 +2,9 @@ import React, {PropTypes} from 'react';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
+import {ErrorNotification, SuccessNotification} from "./notifications.jsx";
 
 import request from 'superagent';
-import {notify} from 'react-notify-toast';
 
 class ConfigDialog extends React.Component {
 
@@ -60,10 +60,9 @@ class ConfigDialog extends React.Component {
                     "link": this.state.link
                 })).end((err, res) => {
                 if (err || !res.ok) {
-                    notify.show('Error during updating configuration: ' + err.toString(), "error");
-                    // this.handleClose();
+                    this.refs.errorNotification.handleOpen('Error during updating configuration: ' + err);
                 } else {
-                    notify.show('Config was updated: ' + res.body, "success");
+                    this.refs.successNotification.handleOpen('Configuration was successfully updated');
                     this.handleClose();
                 }
             }) :
@@ -77,10 +76,9 @@ class ConfigDialog extends React.Component {
                 "link": this.state.link
             })).end((err, res) => {
             if (err || !res.ok) {
-                notify.show('Error during adding new configuration: ' + err.toString(), "error");
-                // this.handleClose();
+                this.refs.errorNotification.handleOpen('Error during adding new configuration: ' + err);
             } else {
-                notify.show('A new config was submitted: ' + res.body, "success");
+                this.refs.successNotification.handleOpen('Configuration was successfully added');
                 this.handleClose();
             }
         });
@@ -109,6 +107,8 @@ class ConfigDialog extends React.Component {
 
         return (
             <div>
+                <ErrorNotification ref='errorNotification'/>
+                <SuccessNotification ref='successNotification'/>
                 <Dialog open={this.state.openDialog || this.state.isEdit}
                         title={this.props.title}
                         actions={actions}

@@ -1,7 +1,7 @@
 import React, {Component, PropTypes} from 'react';
 import NewConfigButton from "./newConfigForm.jsx";
 import ConfigTable from "./configTable.jsx";
-import {notify} from 'react-notify-toast';
+import {ErrorNotification} from "./notifications.jsx"
 
 import request from 'superagent';
 
@@ -17,7 +17,7 @@ export default class ConfigsInfo extends Component {
         request.get("configs/")
             .end((err, res) => {
                 if (err || !res.ok) {
-                    notify.show('Error during getting configs: ' + err, "error");
+                    this.refs.messageNotification.handleOpen('Error during getting configs: ' + err);
                 } else {
                     // notify.show('yay got ' + JSON.stringify(res.body), "success");
                     this.setState({configs: res.body})
@@ -33,6 +33,7 @@ export default class ConfigsInfo extends Component {
 
     render() {
         return ( <div>
+            <ErrorNotification ref='messageNotification'/>
             <ConfigTable configs={this.state.configs} onEdit={this.loadConfigsFromServer}/>
             <div style={{width: '100%', paddingTop: '10px', paddingBottom: '10px'}}>
                 <NewConfigButton onClose={this.loadConfigsFromServer} title={"Add new config"}/>

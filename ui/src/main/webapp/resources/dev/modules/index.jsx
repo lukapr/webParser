@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import Notifications from 'react-notify-toast';
 import {Tabs, Tab} from 'material-ui/Tabs';
 import ConfigsInfo from './configsInfo.jsx'
 import Results from './results.jsx'
+import Products from './products.jsx'
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 const styles = {
     headline: {
@@ -29,23 +30,27 @@ export default class Index extends Component {
     };
 
     render() {
-        return ( <div style={{width: '80%', margin: 'auto'}}>
-            <Notifications/>
-            <Tabs
-                value={this.state.value}
-                onChange={this.handleChange}
-            >
-                <Tab label="Home"  value="home">
-                    <h2>Home</h2>
-                </Tab>
-                <Tab label="Configs" value="configs">
-                    <ConfigsInfo load={this.state.value === "configs"}/>
-                </Tab>
-                <Tab label="Result" value="results">
-                    <Results  load={this.state.value === "results"}/>
-                </Tab>
-            </Tabs>
-        </div>)
+        return (<MuiThemeProvider>
+            <div style={{width: '80%', margin: 'auto'}}>
+                <Tabs
+                    value={this.state.value}
+                    onChange={this.handleChange}
+                >
+                    <Tab label="Home" value="home">
+                        <h2>Home!!!</h2>
+                    </Tab>
+                    <Tab label="Configs" value="configs">
+                        <ConfigsInfo load={this.state.value === "configs"}/>
+                    </Tab>
+                    <Tab label="Result" value="results">
+                        <Results load={this.state.value === "results"}/>
+                    </Tab>
+                    <Tab label="Products" value="products">
+                        <Products load={this.state.value === "products"}/>
+                    </Tab>
+                </Tabs>
+            </div>
+        </MuiThemeProvider>)
             ;
     }
 
