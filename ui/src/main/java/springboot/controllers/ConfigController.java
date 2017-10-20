@@ -43,6 +43,7 @@ public class ConfigController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public boolean deleteConfiguration(@PathVariable("id") Long id) throws Exception {
         LOG.info("deleteConfiguration() with id = " + id);
+        //TODO delete tasks!!
         this.getConfigRepository().delete(id);
         return !getConfigRepository().exists(id);
     }

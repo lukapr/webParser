@@ -3,6 +3,7 @@ import {Tabs, Tab} from 'material-ui/Tabs';
 import ConfigsInfo from './configsInfo.jsx'
 import Results from './results.jsx'
 import Products from './products.jsx'
+import Category from './category.jsx'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 const styles = {
@@ -47,6 +48,9 @@ export default class Index extends Component {
                     </Tab>
                     <Tab label="Products" value="products">
                         <Products load={this.state.value === "products"}/>
+                    </Tab>
+                    <Tab label="Categories" value="categories">
+                        <Category load={this.state.value === "categories"}/>
                     </Tab>
                 </Tabs>
             </div>

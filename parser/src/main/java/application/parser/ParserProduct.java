@@ -29,13 +29,13 @@ public class ParserProduct {
     @Autowired
     private ProductRepository repository;
 
-    public List<Product> parse(Category category) throws Exception {
+    public void parse(Category category) throws Exception {
         String href = category.getHref();
         Document doc = ParserHelper.getDocument(href + "?" + PAGE_SIZE);
 
         List<Product> products = new ArrayList<>();
         if (doc.getElementById("divGoodsNotFound") != null) {
-            return products;
+            return;
         }
         int numberOfPages = (int) Math.ceil(Integer.parseInt(((TextNode) doc.select(".total.many").get(0).childNode(1)
                 .childNode(0)).text()) / 100.0);
@@ -47,7 +47,6 @@ public class ParserProduct {
             }
         }
         repository.save(products);
-        return products;
     }
 
     private List<Product> createProducts(Element element, Category category) {
@@ -64,6 +63,7 @@ public class ParserProduct {
                 String url = createUrl(article);
                 product.setHref(url);
                 product.setName(element.getElementsByClass("brand-name").text());
+                //TODO check it! Not working for many products
                 product.setImg(element.getElementsByClass("thumbnail").get(0).attr("src"));
             }
             product.addCategory(category);

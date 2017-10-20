@@ -41,23 +41,20 @@ public class ParserImpl {
     ParserStatistics parserStatistics;
 
 //    @Transactional
-    public boolean parse(String link) throws Exception {
+    public void parse(String link) throws Exception {
         final List<Category> categories = parserCategory.parse(link + "?" + PAGE_SIZE);
         for (Category category : categories) {
-            final Category currentCategory = Optional.ofNullable(getRepository().findByName(category.getName()).get(0))
-                    .orElseThrow(() -> new Exception("Not able to find category with name: " + category.getName()));
+            final List<Category> categoryFromDb = getRepository().findByName(category.getName());
+            //TODO need to add additional parameter to name
+            Category currentCategory = categoryFromDb.isEmpty() ? category : categoryFromDb.get(0);
             parserProduct.parse(currentCategory);
 
             final List<Product> products = getProductRepository().findByCategoriesContains(currentCategory);
 
-//            final Category currentCategoryWithProducts = Optional.ofNullable(getRepository()
-//                    .findByName(category.getName()).get(0))
-//                    .orElseThrow(() -> new Exception("Not able to find category with name: " + category.getName()));
             for (Product product : products) {
                 parserStatistics.parse(product);
             }
         }
-        return true;
     }
 
 //    public boolean parse(String link) throws Exception {

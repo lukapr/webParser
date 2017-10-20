@@ -36,11 +36,11 @@ public class ParserCategory {
             categoriesList.add(new Category(document.getElementById("catalog-content").getElementsByTag("h1")
                     .get(0).text(), link));
         }
-        categoriesList.forEach(category -> {
-            if(repository.findByName(category.getName()).size() == 0) {
-                repository.save(category);
-            }
-        });
+//        categoriesList.forEach(category -> {
+//            if(repository.findByName(category.getName()).size() == 0) {
+//                repository.save(category);
+//            }
+//        });
         return categoriesList;
     }
 }

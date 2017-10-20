@@ -56,3 +56,6 @@ CREATE TABLE restcount
   statisticsid INTEGER
     REFERENCES statistics (id)
 );
+
+insert INTO config (name, description, link, createdon, lastupdated) VALUES ('1', '1', 'https://www.wildberries.ru/catalog/zhenshchinam/bele-i-kupalniki/kombidressy', current_timestamp, current_timestamp)
+insert INTO config (name, description, link, createdon, lastupdated) VALUES ('2', '2', 'https://www.wildberries.ru/catalog/zhenshchinam/bele-i-kupalniki/nizhnie-yubki', current_timestamp, current_timestamp)
