@@ -28,7 +28,8 @@
     "react-mdl": "^1.10.3",
     "react-notify-toast": "^0.3.2",
     "superagent": "^3.6.0",
-    "jqwidgets-framework": "^5.4.0"
+    "jqwidgets-framework": "^5.4.0",
+    "react-image-lightbox": "^4.3.0"
   },
   "devDependencies": {
     "webpack": "^3.8.1",

@@ -2,7 +2,6 @@ package application.parser;
 
 import datamodels.Category;
 import datamodels.Product;
-import datamodels.Restcount;
 import datamodels.repositories.CategoryRepository;
 import datamodels.repositories.ProductRepository;
 import org.apache.log4j.Logger;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static application.parser.ParserHelper.PAGE_SIZE;
@@ -27,7 +25,9 @@ public class ParserProduct {
     private static Logger logger = Logger.getLogger(ParserProduct.class);
 
     @Autowired
-    private ProductRepository repository;
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     public void parse(Category category) throws Exception {
         String href = category.getHref();
@@ -42,31 +42,35 @@ public class ParserProduct {
         for (int pageNumber = 1; pageNumber <= numberOfPages; pageNumber++) {
             doc = ParserHelper.getDocument(href + "?" + PAGE_SIZE + "&" + PAGE + pageNumber);
             Elements elements = doc.getElementsByClass("dtList");
+            //TODO we need to get products dipper (I mean go to each product on page, for each product check all possible colors)
             for (Element element : elements) {
-                products.addAll(createProducts(element, category));
+                products.addAll(createProducts(element, products));
             }
         }
-        repository.save(products);
+        category.addProducts(products);
+        categoryRepository.save(category);
     }
 
-    private List<Product> createProducts(Element element, Category category) {
+    private List<Product> createProducts(Element element, List<Product> parsedProducts) {
         List<Product> products = new ArrayList<>();
         String[] articles = element.getElementsByAttribute("data-colors").attr("data-colors").split(",");
         for (String article : articles) {
+            if (parsedProducts.stream().anyMatch(v -> v.getArticle().equals(article))) {
+                continue;
+            }
 //            logger.info("Start getting info for product with article " + article);
             Product product;
-            if (repository.findByArticle(article).size() > 0) {
-                product = repository.findByArticle(article).get(0);
+            if (productRepository.findByArticle(article).size() > 0) {
+                product = productRepository.findByArticle(article).get(0);
             } else {
                 product = new Product();
                 product.setArticle(article);
                 String url = createUrl(article);
                 product.setHref(url);
                 product.setName(element.getElementsByClass("brand-name").text());
-                //TODO check it! Not working for many products
-                product.setImg(element.getElementsByClass("thumbnail").get(0).attr("src"));
+                String origImg = element.getElementsByClass("thumbnail").get(0).attr("data-original");
+                product.setImg(origImg.equals("") ? element.getElementsByClass("thumbnail").get(0).attr("src") : origImg);
             }
-            product.addCategory(category);
             products.add(product);
         }
         return products;

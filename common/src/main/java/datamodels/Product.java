@@ -1,5 +1,6 @@
 package datamodels;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,25 +25,13 @@ public class Product implements Serializable {
     private String href;
     private String img;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
-    @JoinTable(
-            name = "category_product",
-            joinColumns = @JoinColumn(name = "productid", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "categoryid", referencedColumnName = "id"))
-    @JsonManagedReference
+    @ManyToMany(mappedBy = "products", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonBackReference
     private Set<Category> categories;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
     @JsonManagedReference
     private Set<Statistics> statistics;
-
-
-    public void addCategory(Category category) {
-        if (categories == null) {
-            categories = new HashSet<>();
-        }
-        categories.add(category);
-    }
 
 //    @Override
 //    public boolean equals(Object o) {

@@ -3,9 +3,9 @@ var webpack = require('webpack');
 module.exports = {
     entry: './webapp/resources/dev/app.jsx',
     output: {
-        path: path.resolve(__dirname, './resources/static/dist'),
+        // path: path.resolve(__dirname, './resources/static/dist'),
         //TODO resolve this path correctly!
-        // path: path.resolve(__dirname, '../../target/classes/static/dist'),
+        path: path.resolve(__dirname, '../../target/classes/static/dist'),
         filename: 'bundle.js'
     },
     // resolve: {

@@ -2,6 +2,7 @@ package datamodels;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -11,9 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @Entity
@@ -27,9 +26,14 @@ public class Category implements Serializable {
     private String name;
     private String href;
 
-    @ManyToMany(mappedBy = "categories", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonBackReference
-    private Set<Product> products;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.REMOVE})
+    @JoinTable(
+            name = "category_product",
+            joinColumns = @JoinColumn(name = "categoryid", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "productid", referencedColumnName = "id"))
+    @JsonManagedReference
+    @MapKey(name = "article")
+    private Map<String, Product> products;
 
     public Category(String name, String href) {
         this.name = name;
@@ -65,5 +69,12 @@ public class Category implements Serializable {
                 ", name='" + name + '\'' +
                 ", href='" + href + '\'' +
                 '}';
+    }
+
+    public void addProducts(List<Product> products) {
+        if (this.products == null) {
+            this.products = new HashMap<>();
+        }
+        products.forEach(product -> this.products.put(product.getArticle(), product));
     }
 }
