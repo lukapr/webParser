@@ -175,7 +175,7 @@ public class Main {
             Document doc = getDoc(url);
 
             product.setOrdersCount(doc.getElementsByClass("j-orders-count").text());
-            String cost = doc.getElementById("Price").text();
+            String cost = doc.getElementById("Price") == null ? "0" : doc.getElementById("Price").text();
             product.setCost(cost);
             String origCost = doc.getElementsByTag("del").text();
             product.setOriginalCost(origCost.equals("") ? cost : origCost);
